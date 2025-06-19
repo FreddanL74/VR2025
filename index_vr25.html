@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Vätternrundan 2025 Results</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+    body { padding:10px; font-size:0.9em; }
+    .container-fluid { padding-left:5px; padding-right:5px; }
+    #resultsTable { font-size:0.7em; margin-left:0!important; }
+    .pagination { font-size:0.8em; }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <h1>Vätternrundan 2025 Results</h1>
+    <table class="table table-striped" id="resultsTable">
+      <thead>
+        <tr>
+        <th>Startnr</th>
+        <th>Name</th>
+        <th>Ort</th>
+        <th>Result</th>
+        <th>Starttime</th>
+        <th>Arrival Ödeshög</th>
+        <th>Split Ödeshög</th>
+        <th>Speed Ödeshög</th>
+        <th>Arrival Jönköping</th>
+        <th>Split Jönköping</th>
+        <th>Speed Jönköping</th>
+        <th>Leaving Jönköping</th>
+        <th>Split Leaving Jönköping</th>
+        <th>Arrival Hjo</th>
+        <th>Split Hjo</th>
+        <th>Speed Hjo</th>
+        <th>Leaving Hjo</th>
+        <th>Split Leaving Hjo</th>
+        <th>Arrival Karlsborg</th>
+        <th>Split Karlsborg</th>
+        <th>Speed Karlsborg</th>
+        <th>Arrival Askersund</th>
+        <th>Split Askersund</th>
+        <th>Speed Askersund</th>
+        <th>Arrival Bona</th>
+        <th>Split Bona</th>
+        <th>Speed Bona</th>
+        <th>Arrival Goal</th>
+        <th>Split Goal</th>
+        <th>Speed Goal</th>
+        <th>Placement</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <nav><ul class="pagination" id="pagination"></ul></nav>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script>
+    const pageSize = 50;
+    let currentPage = 1;
+    let data = [];
+
+    // custom sort by Placement: numeric first, then DNF, then DNS
+    function placementSort(a, b) {
+      const pa = a.Placement, pb = b.Placement;
+      const na = Number(pa), nb = Number(pb);
+      if (!isNaN(na) && !isNaN(nb)) return na - nb;
+      if (!isNaN(na)) return -1;
+      if (!isNaN(nb)) return 1;
+      if (pa === pb) return 0;
+      if (pa === 'DNF') return -1;
+      return 1;
+    }
+
+    function renderTable() {
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const pageItems = data.slice(start, end);
+      const tbody = $('#resultsTable tbody').empty();
+      pageItems.forEach(row => {
+        const tr = $('<tr>');
+        tr.append($('<td>').text(row['Startnr']));
+        tr.append($('<td>').text(row['Name']));
+        tr.append($('<td>').text(row['Ort']));
+        tr.append($('<td>').text(row['Result']));
+        tr.append($('<td>').text(row['Starttime']));
+        tr.append($('<td>').text(row['Arrival Ödeshög']));
+        tr.append($('<td>').text(row['Split Ödeshög']));
+        tr.append($('<td>').text(row['Speed Ödeshög']));
+        tr.append($('<td>').text(row['Arrival Jönköping']));
+        tr.append($('<td>').text(row['Split Jönköping']));
+        tr.append($('<td>').text(row['Speed Jönköping']));
+        tr.append($('<td>').text(row['Leaving Jönköping']));
+        tr.append($('<td>').text(row['Split Leaving Jönköping']));
+        tr.append($('<td>').text(row['Arrival Hjo']));
+        tr.append($('<td>').text(row['Split Hjo']));
+        tr.append($('<td>').text(row['Speed Hjo']));
+        tr.append($('<td>').text(row['Leaving Hjo']));
+        tr.append($('<td>').text(row['Split Leaving Hjo']));
+        tr.append($('<td>').text(row['Arrival Karlsborg']));
+        tr.append($('<td>').text(row['Split Karlsborg']));
+        tr.append($('<td>').text(row['Speed Karlsborg']));
+        tr.append($('<td>').text(row['Arrival Askersund']));
+        tr.append($('<td>').text(row['Split Askersund']));
+        tr.append($('<td>').text(row['Speed Askersund']));
+        tr.append($('<td>').text(row['Arrival Bona']));
+        tr.append($('<td>').text(row['Split Bona']));
+        tr.append($('<td>').text(row['Speed Bona']));
+        tr.append($('<td>').text(row['Arrival Goal']));
+        tr.append($('<td>').text(row['Split Goal']));
+        tr.append($('<td>').text(row['Speed Goal']));
+        tr.append($('<td>').text(row['Placement']));
+        tbody.append(tr);
+      });
+    }
+
+    function renderPagination() {
+      const pageCount = Math.ceil(data.length / pageSize);
+      const ul = $('#pagination').empty();
+      ul.append($('<li>').toggleClass('disabled', currentPage === 1)
+        .append($('<a>').html('&laquo;').click(() => { if (currentPage > 1) { currentPage--; update(); } })));
+      for (let i = 1; i <= pageCount; i++) {
+        ul.append($('<li>').toggleClass('active', i === currentPage)
+          .append($('<a>').text(i).click(() => { currentPage = i; update(); })));
+      }
+      ul.append($('<li>').toggleClass('disabled', currentPage === pageCount)
+        .append($('<a>').html('&raquo;').click(() => { if (currentPage < pageCount) { currentPage++; update(); } })));
+    }
+
+    function update() {
+      renderTable();
+      renderPagination();
+    }
+
+    $(document).ready(() => {
+      $.getJSON('VR25-B.json', json => {
+        data = json.sort(placementSort);
+        update();
+      });
+    });
+  </script>
+</body>
+</html>
